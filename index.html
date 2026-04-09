@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Water Collective | Master Journal</title>
+    <title>Open Water Collective | My Journal</title>
     <style>
         :root {
             --primary: #0077b6; --secondary: #00b4d8; --dark: #03045e;
@@ -19,29 +19,38 @@
             backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 20px;
         }
         .input-card { background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid transparent; }
-        .editing-mode { border-color: var(--secondary); background: #f0fbff; }
+        .editing-mode { border-color: var(--secondary); background: #f0fbff; box-shadow: 0 0 20px rgba(0,180,216,0.2); }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; align-items: end; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         .span-full { grid-column: 1 / -1; }
         label { font-weight: 600; font-size: 0.75rem; color: var(--primary); }
         input, select, textarea { padding: 10px; border: 2px solid #edf2f7; border-radius: 8px; font-size: 0.9rem; outline: none; }
-        .photo-upload-area { display: flex; align-items: center; gap: 10px; }
-        #photoPreview { height: 40px; width: 40px; border-radius: 5px; object-fit: cover; display: none; }
         .file-label { background: #f8fafc; border: 1px solid #cbd5e0; padding: 8px; border-radius: 8px; cursor: pointer; flex-grow: 1; text-align: center; font-size: 0.8rem; }
         .btn-add { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; width: 100%; margin-top: 10px; }
+        .btn-update { background: #2a9d8f; }
+        
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .stat-box { background: var(--white); padding: 12px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--secondary); }
         .stat-val { display: block; font-size: 1.3rem; font-weight: 800; }
         .stat-label { font-size: 0.6rem; color: #666; text-transform: uppercase; }
+
+        .insights-row { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 20px; }
+        .insight-card { background: var(--white); padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .insight-card h3 { margin: 0 0 10px 0; font-size: 0.85rem; color: var(--primary); text-transform: uppercase; }
+        .month-stat { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; }
+
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.7rem; color: var(--primary); text-transform: uppercase; }
         td { padding: 10px 12px; border-top: 1px solid #f1f5f9; vertical-align: middle; font-size: 0.85rem; }
         .temp-pill { background: var(--light); padding: 3px 6px; border-radius: 4px; font-weight: bold; }
-        .map-link { color: #2a9d8f; text-decoration: none; margin-left: 4px; }
         .loc-tag { display: block; font-size: 0.7rem; color: #666; font-weight: 600; }
+        .map-link { color: #2a9d8f; text-decoration: none; margin-left: 4px; }
         .swim-img { max-width: 50px; border-radius: 4px; cursor: pointer; }
         .btn-action { cursor: pointer; border: none; background: none; font-size: 0.9rem; opacity: 0.4; margin-right: 5px; }
-        .footer { text-align: center; padding: 30px 0; opacity: 0.4; font-size: 0.7rem; }
+        .btn-action:hover { opacity: 1; transform: scale(1.1); }
+        .footer { text-align: center; padding: 30px 0; opacity: 0.3; font-size: 0.7rem; }
+
+        @media (max-width: 800px) { .insights-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -70,12 +79,12 @@
             <div class="field">
                 <label>Photo</label>
                 <div class="photo-upload-area">
-                    <img id="photoPreview" src="">
+                    <img id="photoPreview" src="" style="height:35px; width:35px; border-radius:5px; display:none;">
                     <label for="inPhoto" class="file-label">📸 Choose</label>
                     <input type="file" id="inPhoto" hidden accept="image/*" onchange="previewImage(this)">
                 </div>
             </div>
-            <div class="field span-full"><label>Swim Notes</label><textarea id="inNotes" rows="2"></textarea></div>
+            <div class="field span-full"><label>Journal Notes</label><textarea id="inNotes" rows="2"></textarea></div>
             <button class="btn-add span-full" id="submitBtn" onclick="saveEntry()">✅ Save Swim</button>
             <button class="btn-add span-full" id="cancelBtn" style="display:none; background:#ccc;" onclick="cancelEdit()">Cancel Edit</button>
         </div>
@@ -88,13 +97,18 @@
         <div class="stat-box" style="border-color: var(--warm);"><span class="stat-val" id="stWarm">0</span><span class="stat-label">Warmest</span></div>
     </div>
 
+    <div class="insights-row">
+        <div class="insight-card"><h3>📊 Monthly Swims</h3><div id="monthlyStats"></div></div>
+        <div class="insight-card"><h3>💡 Dynamic Facts</h3><div id="dynamicFacts" style="font-size: 0.85rem; color: #444; line-height:1.5;"></div></div>
+    </div>
+
     <table>
-        <thead><tr><th>Photo</th><th>Date & Location</th><th>Temp</th><th>Stats</th><th>Notes</th><th></th></tr></thead>
+        <thead><tr><th>Photo</th><th>Date & Location</th><th>Temp</th><th>Time / Dist</th><th>Notes</th><th></th></tr></thead>
         <tbody id="journalBody"></tbody>
     </table>
 
     <div class="footer">
-        <button onclick="hardReset()" style="cursor:pointer; background:none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px;">Reset to Master Notebook Data</button>
+        <button onclick="hardReset()" style="cursor:pointer; background:none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; color: #666;">Factory Reset (Restore 116 records)</button>
     </div>
 </div>
 
@@ -207,7 +221,7 @@
         { date: '2025-07-11', temp: 23.4, time: 47.08, dist: 1083, location: 'Watersedge', notes: '' },
         { date: '2025-07-13', temp: 24.5, time: 55.17, dist: 1200, location: 'Watersedge', notes: '' },
         { date: '2025-07-16', temp: 20.3, time: 30.49, dist: 823, location: 'Watersedge', notes: '' },
-        { date: '2025-07-20', temp: 22.5, time: 32.03, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-07-20', temp: 22.5, time: 32.03, dist: 800, location: 'Watersedge', notes: '100th Swim!' },
         { date: '2025-07-22', temp: 21.8, time: 35.19, dist: 729, location: 'Watersedge', notes: '' },
         { date: '2025-07-27', temp: 21.0, time: 34.59, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-07-30', temp: 21.2, time: 30.57, dist: 800, location: 'Watersedge', notes: '' },
@@ -235,7 +249,7 @@
         { date: '2025-11-14', temp: 11.2, time: 17.17, dist: 400, location: 'Watersedge', notes: '' },
         { date: '2025-11-19', temp: 7.6, time: 8.31, dist: 180, location: 'Watersedge', notes: '' },
         { date: '2025-11-22', temp: 6.4, time: 9.30, dist: 200, location: 'Watersedge', notes: '' },
-        { date: '2025-11-26', temp: 3.9, time: 11.11, dist: 220, location: 'Watersedge', notes: 'Brrr!' },
+        { date: '2025-11-26', temp: 3.9, time: 11.11, dist: 220, location: 'Watersedge', notes: 'Ice King!' },
         { date: '2025-11-30', temp: 6.5, time: 9.40, dist: 200, location: 'Watersedge', notes: '' },
         { date: '2025-12-03', temp: 6.1, time: 16.17, dist: 300, location: 'Watersedge', notes: '' },
         { date: '2025-12-07', temp: 6.5, time: 12.50, dist: 250, location: 'Watersedge', notes: '' },
@@ -250,7 +264,7 @@
     function saveEntry() {
         const idx = parseInt(document.getElementById('editIndex').value);
         const file = document.getElementById('inPhoto').files[0];
-        const process = (imgBase64) => {
+        const process = (imgBase) => {
             const entry = {
                 date: document.getElementById('inDate').value,
                 temp: parseFloat(document.getElementById('inTemp').value),
@@ -258,19 +272,15 @@
                 dist: parseInt(document.getElementById('inDist').value) || 0,
                 location: document.getElementById('inLocation').value,
                 notes: document.getElementById('inNotes').value,
-                photo: imgBase64 || (idx !== -1 ? swims[idx].photo : null)
+                photo: imgBase || (idx !== -1 ? swims[idx].photo : null)
             };
-            if(!entry.date || isNaN(entry.temp)) return alert("Please fill in Date and Temp!");
+            if(!entry.date || isNaN(entry.temp)) return alert("Date & Temp required!");
             if(idx === -1) swims.push(entry); else swims[idx] = entry;
             localStorage.setItem('mySwims', JSON.stringify(swims));
-            cancelEdit();
-            renderTable();
+            cancelEdit(); renderTable();
         };
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => process(reader.result);
-            reader.readAsDataURL(file);
-        } else { process(null); }
+        if(file) { const reader = new FileReader(); reader.onloadend = () => process(reader.result); reader.readAsDataURL(file); }
+        else process(null);
     }
 
     function editEntry(idx) {
@@ -282,8 +292,9 @@
         document.getElementById('inTime').value = s.time;
         document.getElementById('inDist').value = s.dist;
         document.getElementById('inNotes').value = s.notes || '';
-        document.getElementById('formTitle').innerText = "Editing Record...";
-        document.getElementById('submitBtn').innerText = "💾 Update Record";
+        document.getElementById('formTitle').innerText = "✏️ Editing Record...";
+        document.getElementById('submitBtn').innerText = "Update Record";
+        document.getElementById('submitBtn').classList.add('btn-update');
         document.getElementById('cancelBtn').style.display = "block";
         document.getElementById('inputCard').classList.add('editing-mode');
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -293,6 +304,7 @@
         document.getElementById('editIndex').value = "-1";
         document.getElementById('formTitle').innerText = "Log New Swim";
         document.getElementById('submitBtn').innerText = "✅ Save Swim";
+        document.getElementById('submitBtn').classList.remove('btn-update');
         document.getElementById('cancelBtn').style.display = "none";
         document.getElementById('inputCard').classList.remove('editing-mode');
         document.getElementById('photoPreview').style.display = 'none';
@@ -301,15 +313,23 @@
 
     function renderTable() {
         const body = document.getElementById('journalBody');
+        const monthlyContainer = document.getElementById('monthlyStats');
         body.innerHTML = '';
         let totalD = 0, totalT = 0, cold = 100, warm = 0;
+        const monthlyVolume = {};
+
         swims.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach((s, idx) => {
             totalD += (s.dist || 0); totalT += (s.temp || 0);
             if(s.temp < cold) cold = s.temp; if(s.temp > warm) warm = s.temp;
+            
             const d = new Date(s.date);
             const ukDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const monthKey = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+            monthlyVolume[monthKey] = (monthlyVolume[monthKey] || 0) + 1;
+
             const photoHtml = s.photo ? `<img src="${s.photo}" class="swim-img" onclick="window.open(this.src)">` : '➖';
             const mapUrl = mapLinks[s.location] || `https://www.google.com/maps/search/${encodeURIComponent(s.location)}`;
+
             body.innerHTML += `<tr>
                 <td>${photoHtml}</td>
                 <td><div style="margin-bottom:4px;"><b>${ukDate}</b></div><span class="loc-tag">${s.location || '-'} <a href="${mapUrl}" target="_blank" class="map-link">📍</a></span></td>
@@ -319,10 +339,23 @@
                 <td><button class="btn-action" onclick="editEntry(${idx})">✏️</button><button class="btn-action" onclick="deleteEntry(${idx})">🗑️</button></td>
             </tr>`;
         });
+
         document.getElementById('stCount').innerText = swims.length;
         document.getElementById('stDist').innerText = (totalD / 1000).toFixed(1) + "km";
         document.getElementById('stCold').innerText = swims.length ? cold.toFixed(1) + "°C" : "0°C";
         document.getElementById('stWarm').innerText = swims.length ? warm.toFixed(1) + "°C" : "0°C";
+
+        // Monthly Insights
+        monthlyContainer.innerHTML = Object.entries(monthlyVolume).slice(0, 5).map(([m, c]) => 
+            `<div class="month-stat"><span>${m}</span><strong>${c} swims</strong></div>`).join('');
+
+        // Dynamic Facts
+        const avg = (totalD / swims.length).toFixed(0);
+        document.getElementById('dynamicFacts').innerHTML = `
+            • Average swim distance: <strong>${avg}m</strong>.<br>
+            • Temperature range braved: <strong>${(warm - cold).toFixed(1)}°C</strong>.<br>
+            • Most active location: <strong>Watersedge</strong>.
+        `;
     }
 
     function previewImage(input) {
@@ -334,15 +367,9 @@
         }
     }
 
-    function hardReset() {
-        if(confirm("Factory Reset: Reload all 116 records from your notebooks?")) {
-            localStorage.setItem('mySwims', JSON.stringify(fullMasterHistory));
-            swims = [...fullMasterHistory];
-            renderTable();
-        }
-    }
-
     function deleteEntry(i) { if(confirm("Delete this?")) { swims.splice(i,1); localStorage.setItem('mySwims', JSON.stringify(swims)); renderTable(); } }
+    function hardReset() { if(confirm("This will reload all 116 notebook swims. Proceed?")) { localStorage.setItem('mySwims', JSON.stringify(fullMasterHistory)); swims = [...fullMasterHistory]; renderTable(); } }
+    
     document.getElementById('inDate').value = new Date().toISOString().split('T')[0];
     renderTable();
 </script>

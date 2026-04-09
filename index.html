@@ -1,65 +1,278 @@
-<div class="input-card">
-    <div class="form-grid">
-        <div class="field">
-            <label>Date of Swim</label>
-            <input type="date" id="inDate">
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Water Collective | My Journal</title>
+    <style>
+        :root {
+            --primary: #0077b6; --secondary: #00b4d8; --dark: #03045e;
+            --light: #caf0f8; --accent: #ff4d4d; --white: #ffffff;
+        }
+        body {
+            font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f0f9ff 0%, #cbebff 100%);
+            margin: 0; padding: 20px; color: var(--dark); min-height: 100vh;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header {
+            text-align: center; padding: 30px 0; background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 25px;
+        }
+        .input-card { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; align-items: end; }
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        .span-full { grid-column: 1 / -1; }
+        label { font-weight: 600; font-size: 0.8rem; color: var(--primary); }
+        input, select, textarea { padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-size: 1rem; outline: none; }
+        .file-label { background: #f8fafc; border: 2px dashed #cbd5e0; padding: 10px; border-radius: 10px; cursor: pointer; text-align: center; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1.1rem; margin-top: 10px; }
+        .btn-add:hover { background: var(--dark); transform: translateY(-2px); }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--secondary); }
+        .stat-val { display: block; font-size: 1.6rem; font-weight: 800; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.8rem; color: var(--primary); text-transform: uppercase; }
+        td { padding: 15px; border-top: 1px solid #f1f5f9; vertical-align: top; }
+        .temp-pill { background: var(--light); padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+        .loc-tag { display: block; font-size: 0.75rem; color: #666; margin-top: 4px; font-weight: 600; }
+        .swim-img { max-width: 60px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .swim-img:hover { transform: scale(1.1); }
+        .btn-del { color: #ccc; cursor: pointer; border: none; background: none; font-size: 1.2rem; }
+        .btn-del:hover { color: var(--accent); }
+    </style>
+</head>
+<body>
 
-        <div class="field">
-            <label>Location</label>
-            <select id="inLocation">
-                <option value="" selected>Choose Location...</option>
-                <option value="Watersedge">Watersedge</option>
-                <option value="Escape to the Lake">Escape to the Lake</option>
-                <option value="The Lenches">The Lenches</option>
-                <option value="Wild Wood">Wild Wood</option>
-                <option value="Broadfields">Broadfields</option>
-                <option value="Other">Other (Add in notes)</option>
-            </select>
-        </div>
+<div class="container">
+    <header><h1>🏊‍♂️ My Collective Journal</h1></header>
 
-        <div class="field">
-            <label>Temp (°C)</label>
-            <input type="number" id="inTemp" step="0.1" placeholder="e.g. 12.5">
+    <div class="input-card">
+        <div class="form-grid">
+            <div class="field"><label>Date</label><input type="date" id="inDate"></div>
+            <div class="field">
+                <label>Location</label>
+                <select id="inLocation">
+                    <option value="Watersedge">Watersedge</option>
+                    <option value="Escape to the Lake">Escape to the Lake</option>
+                    <option value="The Lenches">The Lenches</option>
+                    <option value="Wild Wood">Wild Wood</option>
+                    <option value="Broadfields">Broadfields</option>
+                </select>
+            </div>
+            <div class="field"><label>Temp °C</label><input type="number" id="inTemp" step="0.1"></div>
+            <div class="field"><label>Time (mm.ss)</label><input type="number" id="inTime" step="0.01"></div>
+            <div class="field"><label>Dist (m)</label><input type="number" id="inDist"></div>
+            <div class="field"><label>Photo</label><label for="inPhoto" class="file-label">📸 Add Photo</label><input type="file" id="inPhoto" hidden accept="image/*"></div>
+            <div class="field span-full"><label>Swim Notes / Memory</label><textarea id="inNotes"></textarea></div>
+            <button class="btn-add span-full" onclick="saveEntry()">✅ Log This Swim</button>
         </div>
-
-        <div class="field">
-            <label>Time (mm.ss)</label>
-            <input type="number" id="inTime" step="0.01" placeholder="e.g. 25.30">
-        </div>
-
-        <div class="field">
-            <label>Distance (m)</label>
-            <input type="number" id="inDist" placeholder="e.g. 800">
-        </div>
-
-        <div class="field">
-            <label>Swim Photo</label>
-            <label for="inPhoto" class="file-input-label">📷 Upload Image</label>
-            <input type="file" id="inPhoto" accept="image/*">
-            <span id="fileNameDisplay" style="font-size: 10px; color: #666; margin-top: 5px;"></span>
-        </div>
-
-        <div class="field span-2">
-            <label>Journal Notes (How was the water? Who was there?)</label>
-            <textarea id="inNotes" placeholder="Write a short memory of the swim here..."></textarea>
-        </div>
-
-        <button class="btn-add" onclick="saveEntry()">✅ Add to My Collective</button>
     </div>
+
+    <div class="stats-row">
+        <div class="stat-box"><span class="stat-val" id="stCount">0</span><span class="stat-label">Swims</span></div>
+        <div class="stat-box"><span class="stat-val" id="stDist">0</span><span class="stat-label">Total KM</span></div>
+        <div class="stat-box"><span class="stat-val" id="stTemp">0</span><span class="stat-label">Avg Temp</span></div>
+        <div class="stat-box" style="border-color: var(--accent);"><span class="stat-val" id="stCold">0</span><span class="stat-label">Coldest Dip</span></div>
+    </div>
+
+    <table>
+        <thead><tr><th>Photo</th><th>Date / Location</th><th>Temp</th><th>Stats</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="journalBody"></tbody>
+    </table>
 </div>
 
 <script>
-    // Set default date to 'Today' on load
-    window.onload = function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('inDate').value = today;
-    };
+    const initialData = [
+        // 2024
+        { date: '2024-02-02', temp: 6.3, time: 24.00, dist: 450, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-02-16', temp: 9.5, time: 28.27, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-02-18', temp: 10.0, time: 18.07, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-03-01', temp: 6.7, time: 38.03, dist: 450, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-03-08', temp: 6.4, time: 22.00, dist: 450, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-03-15', temp: 9.4, time: 22.09, dist: 450, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-03-22', temp: 11.7, time: 29.28, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-04-12', temp: 12.6, time: 27.34, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-04-17', temp: 11.6, time: 28.00, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-04-24', temp: 12.6, time: 28.38, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-05-03', temp: 13.4, time: 26.00, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-05-08', temp: 16.8, time: 36.36, dist: 820, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-05-15', temp: 18.7, time: 31.23, dist: 770, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-05-27', temp: 17.4, time: 29.45, dist: 770, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-06-05', temp: 17.2, time: 33.57, dist: 770, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-06-12', temp: 16.2, time: 31.05, dist: 770, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-06-21', temp: 21.0, time: 29.47, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-06-26', temp: 23.1, time: 32.00, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-07-02', temp: 20.1, time: 29.47, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-07-07', temp: 17.5, time: 34.37, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-07-14', temp: 18.7, time: 30.58, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-07-18', temp: 20.7, time: 30.39, dist: 1000, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-07-24', temp: 22.1, time: 31.13, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-07-30', temp: 21.5, time: 38.51, dist: 1000, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-02', temp: 23.5, time: 46.32, dist: 1120, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-06', temp: 22.5, time: 35.07, dist: 1000, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-08', temp: 20.3, time: 30.40, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-13', temp: 21.4, time: 44.22, dist: 1200, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-18', temp: 19.0, time: 33.18, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-21', temp: 18.4, time: 28.49, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-23', temp: 18.8, time: 40.00, dist: 1000, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-28', temp: 19.1, time: 56.42, dist: 1600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-08-30', temp: 17.8, time: 27.44, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-09-05', temp: 18.5, time: 33.39, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-09-06', temp: 21.5, time: 30.00, dist: 0, location: 'Watersedge', notes: 'Widths' },
+        { date: '2024-09-13', temp: 18.0, time: 30.00, dist: 0, location: 'Watersedge', notes: 'Widths' },
+        { date: '2024-09-17', temp: 15.7, time: 24.13, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-09-19', temp: 16.0, time: 30.59, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-09-20', temp: 16.1, time: 31.30, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-09-24', temp: 16.5, time: 29.01, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-10-03', temp: 13.0, time: 32.50, dist: 800, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-10-11', temp: 12.1, time: 30.07, dist: 640, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-10-15', temp: 12.1, time: 26.08, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-10-22', temp: 12.0, time: 19.56, dist: 400, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-10-31', temp: 12.5, time: 23.01, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-11-05', temp: 11.8, time: 29.41, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-11-08', temp: 11.2, time: 25.53, dist: 640, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-11-10', temp: 10.5, time: 23.01, dist: 470, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-11-12', temp: 10.1, time: 23.18, dist: 400, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-11-14', temp: 10.2, time: 22.27, dist: 500, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-11-17', temp: 8.9, time: 17.42, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-11-21', temp: 6.7, time: 15.52, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-11-28', temp: 6.6, time: 15.55, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-12-02', temp: 7.7, time: 16.08, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-12-11', temp: 5.9, time: 15.54, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-12-15', temp: 5.7, time: 10.39, dist: 200, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-12-24', temp: 6.0, time: 16.47, dist: 200, location: 'Watersedge', notes: 'Wetsuit' },
+        { date: '2024-12-28', temp: 6.6, time: 15.16, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
+        // 2025
+        { date: '2025-01-01', temp: 7.2, time: 16.22, dist: 300, location: 'Watersedge', notes: '' },
+        { date: '2025-01-07', temp: 5.2, time: 9.58, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-01-12', temp: 3.9, time: 8.00, dist: 150, location: 'Watersedge', notes: 'Approx' },
+        { date: '2025-01-14', temp: 6.0, time: 7.24, dist: 150, location: 'Watersedge', notes: '' },
+        { date: '2025-01-19', temp: 4.5, time: 10.56, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-01-22', temp: 2.6, time: 7.43, dist: 150, location: 'Watersedge', notes: 'Ice King!' },
+        { date: '2025-01-25', temp: 4.8, time: 10.00, dist: 200, location: 'Watersedge', notes: 'Approx' },
+        { date: '2025-01-30', temp: 4.5, time: 10.06, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-02-04', temp: 5.3, time: 13.10, dist: 266, location: 'Watersedge', notes: '' },
+        { date: '2025-02-16', temp: 3.6, time: 9.04, dist: 140, location: 'Watersedge', notes: '' },
+        { date: '2025-02-23', temp: 7.0, time: 12.05, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-02-27', temp: 7.5, time: 16.35, dist: 300, location: 'Watersedge', notes: '' },
+        { date: '2025-03-03', temp: 8.0, time: 19.46, dist: 400, location: 'Watersedge', notes: '' },
+        { date: '2025-03-06', temp: 7.5, time: 10.50, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-03-11', temp: 9.0, time: 10.42, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-03-16', temp: 8.5, time: 10.20, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-03-23', temp: 10.5, time: 9.58, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-03-28', temp: 9.0, time: 18.54, dist: 360, location: 'Watersedge', notes: '' },
+        { date: '2025-04-02', temp: 10.9, time: 21.49, dist: 600, location: 'Watersedge', notes: '' },
+        { date: '2025-04-06', temp: 12.2, time: 15.51, dist: 400, location: 'Watersedge', notes: '' },
+        { date: '2025-04-10', temp: 13.5, time: 23.32, dist: 500, location: 'Watersedge', notes: '' },
+        { date: '2025-04-15', temp: 14.4, time: 28.26, dist: 600, location: 'Watersedge', notes: '' },
+        { date: '2025-04-24', temp: 14.0, time: 19.00, dist: 400, location: 'Watersedge', notes: '' },
+        { date: '2025-04-30', temp: 17.6, time: 26.08, dist: 663, location: 'Watersedge', notes: '' },
+        { date: '2025-05-04', temp: 17.2, time: 30.23, dist: 720, location: 'Watersedge', notes: '' },
+        { date: '2025-05-06', temp: 16.5, time: 31.36, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-05-11', temp: 17.4, time: 30.15, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-05-18', temp: 20.5, time: 33.34, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-05-27', temp: 19.0, time: 25.26, dist: 600, location: 'Watersedge', notes: '' },
+        { date: '2025-06-01', temp: 19.0, time: 29.59, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-06-06', temp: 18.1, time: 32.15, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-06-10', temp: 18.5, time: 30.31, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-06-18', temp: 21.0, time: 58.31, dist: 1600, location: 'Watersedge', notes: 'Long Swim' },
+        { date: '2025-06-21', temp: 24.5, time: 38.50, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-06-25', temp: 23.0, time: 35.45, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-06-28', temp: 23.2, time: 45.08, dist: 1000, location: 'Watersedge', notes: '' },
+        { date: '2025-06-30', temp: 28.0, time: 49.16, dist: 1000, location: 'Watersedge', notes: 'Hottest' },
+        { date: '2025-07-02', temp: 24.0, time: 35.05, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-07-11', temp: 23.4, time: 47.08, dist: 1083, location: 'Watersedge', notes: '' },
+        { date: '2025-07-13', temp: 24.5, time: 55.17, dist: 1200, location: 'Watersedge', notes: '' },
+        { date: '2025-07-16', temp: 20.3, time: 30.49, dist: 823, location: 'Watersedge', notes: '' },
+        { date: '2025-07-20', temp: 22.5, time: 32.03, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-07-22', temp: 21.8, time: 35.19, dist: 729, location: 'Watersedge', notes: '' },
+        { date: '2025-07-27', temp: 21.0, time: 34.59, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-07-30', temp: 21.2, time: 30.57, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-08-03', temp: 20.7, time: 35.06, dist: 1000, location: 'Watersedge', notes: '' },
+        { date: '2025-08-06', temp: 18.6, time: 30.55, dist: 770, location: 'Watersedge', notes: '' },
+        { date: '2025-08-10', temp: 20.5, time: 34.54, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-08-12', temp: 21.6, time: 43.05, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-08-17', temp: 22.4, time: 48.34, dist: 1200, location: 'Watersedge', notes: '' },
+        { date: '2025-08-19', temp: 21.5, time: 35.11, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-08-22', temp: 22.0, time: 56.44, dist: 1600, location: 'Watersedge', notes: '' },
+        { date: '2025-08-26', temp: 20.0, time: 34.13, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-08-29', temp: 20.9, time: 41.58, dist: 1200, location: 'Watersedge', notes: '' },
+        { date: '2025-09-05', temp: 18.0, time: 26.35, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-09-08', temp: 17.5, time: 25.33, dist: 600, location: 'Watersedge', notes: '' },
+        { date: '2025-09-17', temp: 14.8, time: 21.44, dist: 500, location: 'Watersedge', notes: '' },
+        { date: '2025-09-24', temp: 14.0, time: 28.20, dist: 700, location: 'Watersedge', notes: '' },
+        { date: '2025-10-05', temp: 13.9, time: 19.59, dist: 400, location: 'Watersedge', notes: '' },
+        { date: '2025-10-12', temp: 13.4, time: 28.07, dist: 800, location: 'Watersedge', notes: '' },
+        { date: '2025-10-15', temp: 12.5, time: 20.43, dist: 400, location: 'Watersedge', notes: '' },
+        { date: '2025-10-23', temp: 12.9, time: 25.50, dist: 500, location: 'Watersedge', notes: '' },
+        { date: '2025-10-26', temp: 11.3, time: 20.40, dist: 400, location: 'Watersedge', notes: '' },
+        { date: '2025-10-31', temp: 10.0, time: 10.10, dist: 150, location: 'Watersedge', notes: '' },
+        { date: '2025-11-02', temp: 9.0,  time: 24.57, dist: 600, location: 'Watersedge', notes: '' },
+        { date: '2025-11-09', temp: 11.5, time: 25.00, dist: 500, location: 'Watersedge', notes: '' },
+        { date: '2025-11-14', temp: 11.2, time: 17.17, dist: 400, location: 'Watersedge', notes: '' },
+        { date: '2025-11-19', temp: 7.6,  time: 8.31,  dist: 180, location: 'Watersedge', notes: '' },
+        { date: '2025-11-22', temp: 6.4,  time: 9.30,  dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-11-26', temp: 3.9,  time: 11.11, dist: 220, location: 'Watersedge', notes: 'Brrr!' },
+        { date: '2025-11-30', temp: 6.5,  time: 9.40,  dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-12-03', temp: 6.1,  time: 16.17, dist: 300, location: 'Watersedge', notes: '' },
+        { date: '2025-12-07', temp: 6.5,  time: 12.50, dist: 250, location: 'Watersedge', notes: '' },
+        { date: '2025-12-14', temp: 6.5,  time: 13.00, dist: 250, location: 'Watersedge', notes: '' },
+        { date: '2025-12-17', temp: 5.5,  time: 15.16, dist: 300, location: 'Watersedge', notes: '' },
+        { date: '2025-12-21', temp: 7.5,  time: 16.44, dist: 250, location: 'Watersedge', notes: '' },
+        { date: '2025-12-28', temp: 5.5,  time: 10.10, dist: 200, location: 'Watersedge', notes: '' }
+    ];
 
-    // UI Feedback for file upload
-    document.getElementById('inPhoto').onchange = function() {
-        document.getElementById('fileNameDisplay').innerText = this.files[0].name + " selected";
-    };
+    let swims = JSON.parse(localStorage.getItem('mySwims')) || initialData;
 
-    // ... (Keep the rest of your saveEntry() and renderTable() logic from the previous version) ...
+    function saveEntry() {
+        const file = document.getElementById('inPhoto').files[0];
+        const process = (imgBase64) => {
+            const entry = {
+                date: document.getElementById('inDate').value,
+                temp: parseFloat(document.getElementById('inTemp').value),
+                time: parseFloat(document.getElementById('inTime').value) || 0,
+                dist: parseInt(document.getElementById('inDist').value) || 0,
+                location: document.getElementById('inLocation').value,
+                notes: document.getElementById('inNotes').value,
+                photo: imgBase64 || null
+            };
+            if(!entry.date || isNaN(entry.temp)) return alert("Date and Temp are required!");
+            swims.push(entry);
+            localStorage.setItem('mySwims', JSON.stringify(swims));
+            renderTable();
+            document.querySelectorAll('input, select, textarea').forEach(i => i.value = '');
+        };
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => process(reader.result);
+            reader.readAsDataURL(file);
+        } else { process(null); }
+    }
+
+    function renderTable() {
+        const body = document.getElementById('journalBody');
+        body.innerHTML = '';
+        let totalD = 0; let totalT = 0; let cold = 100;
+        swims.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach((s, idx) => {
+            totalD += s.dist; totalT += s.temp; if(s.temp < cold) cold = s.temp;
+            body.innerHTML += `<tr>
+                <td>${s.photo ? `<img src="${s.photo}" class="swim-img" onclick="window.open(this.src)">` : '➖'}</td>
+                <td><b>${s.date}</b><span class="loc-tag">${s.location}</span></td>
+                <td><span class="temp-pill">${s.temp.toFixed(1)}°C</span></td>
+                <td>${s.dist}m / ${s.time}m</td>
+                <td><small>${s.notes}</small></td>
+                <td><button class="btn-del" onclick="deleteEntry(${idx})">×</button></td>
+            </tr>`;
+        });
+        document.getElementById('stCount').innerText = swims.length;
+        document.getElementById('stDist').innerText = (totalD / 1000).toFixed(1) + "km";
+        document.getElementById('stTemp').innerText = (totalT / swims.length).toFixed(1) + "°C";
+        document.getElementById('stCold').innerText = (cold === 100 ? 0 : cold).toFixed(1) + "°C";
+    }
+
+    function deleteEntry(i) { if(confirm("Delete this?")) { swims.splice(i,1); localStorage.setItem('mySwims', JSON.stringify(swims)); renderTable(); } }
+    document.getElementById('inDate').value = new Date().toISOString().split('T')[0];
+    renderTable();
 </script>
+</body>
+</html>

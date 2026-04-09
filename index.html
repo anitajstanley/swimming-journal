@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Water Collective | Master Journal</title>
+    <title>Open Water Collective | My Journal</title>
     <style>
         :root {
             --primary: #0077b6; --secondary: #00b4d8; --dark: #03045e;
@@ -25,16 +25,27 @@
         .span-full { grid-column: 1 / -1; }
         label { font-weight: 600; font-size: 0.8rem; color: var(--primary); }
         input, select, textarea { padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-size: 1rem; outline: none; }
-        .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1.1rem; width: 100%; }
+        
+        /* Photo Upload Styling */
+        .photo-upload-area { display: flex; align-items: center; gap: 15px; }
+        .file-label { background: #f8fafc; border: 2px dashed #cbd5e0; padding: 10px; border-radius: 10px; cursor: pointer; text-align: center; flex-grow: 1; font-size: 0.9rem; }
+        #photoPreview { height: 45px; width: 45px; border-radius: 8px; object-fit: cover; display: none; border: 1px solid #ddd; }
+
+        .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1.1rem; width: 100%; margin-top: 10px; }
+        .btn-add:hover { background: var(--dark); transform: translateY(-2px); }
         .btn-update { background: #2a9d8f; }
+
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-box { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--secondary); }
         .stat-val { display: block; font-size: 1.6rem; font-weight: 800; }
+        
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.8rem; color: var(--primary); text-transform: uppercase; }
         td { padding: 15px; border-top: 1px solid #f1f5f9; vertical-align: top; }
+        
         .temp-pill { background: var(--light); padding: 4px 8px; border-radius: 6px; font-weight: bold; }
         .loc-tag { display: block; font-size: 0.75rem; color: #666; margin-top: 4px; font-weight: 600; }
+        .swim-img { max-width: 60px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
         .btn-action { cursor: pointer; border: none; background: none; font-size: 1rem; margin-right: 10px; opacity: 0.5; }
         .btn-action:hover { opacity: 1; }
         .footer-tools { margin-top: 40px; text-align: center; }
@@ -64,9 +75,19 @@
             <div class="field"><label>Temp °C</label><input type="number" id="inTemp" step="0.1"></div>
             <div class="field"><label>Time (mm.ss)</label><input type="number" id="inTime" step="0.01"></div>
             <div class="field"><label>Dist (m)</label><input type="number" id="inDist"></div>
+            
+            <div class="field">
+                <label>Photo</label>
+                <div class="photo-upload-area">
+                    <img id="photoPreview" src="">
+                    <label for="inPhoto" class="file-label">📸 Choose Photo</label>
+                    <input type="file" id="inPhoto" hidden accept="image/*" onchange="previewImage(this)">
+                </div>
+            </div>
+
             <div class="field span-full"><label>Swim Notes</label><textarea id="inNotes"></textarea></div>
             <button class="btn-add" id="submitBtn" onclick="saveEntry()">✅ Log This Swim</button>
-            <button class="btn-add" id="cancelBtn" style="display:none; background:#ccc; margin-top:10px;" onclick="cancelEdit()">Cancel</button>
+            <button class="btn-add" id="cancelBtn" style="display:none; background:#ccc; margin-top:10px;" onclick="cancelEdit()">Cancel Edit</button>
         </div>
     </div>
 
@@ -78,7 +99,7 @@
     </div>
 
     <table>
-        <thead><tr><th>Date / Location</th><th>Temp</th><th>Stats</th><th>Notes</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Photo</th><th>Date / Location</th><th>Temp</th><th>Stats</th><th>Notes</th><th>Actions</th></tr></thead>
         <tbody id="journalBody"></tbody>
     </table>
 
@@ -88,6 +109,7 @@
 </div>
 
 <script>
+    // COMPLETE MASTER DATA (2024-2025)
     const fullMasterHistory = [
         { date: '2024-02-02', temp: 6.3, time: 24.00, dist: 450, location: 'Watersedge', notes: 'Wetsuit' },
         { date: '2024-02-16', temp: 9.5, time: 28.27, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
@@ -179,11 +201,11 @@
         { date: '2025-06-01', temp: 19.0, time: 29.59, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-06-06', temp: 18.1, time: 32.15, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-06-10', temp: 18.5, time: 30.31, dist: 800, location: 'Watersedge', notes: '' },
-        { date: '2025-06-18', temp: 21.0, time: 58.31, dist: 1600, location: 'Watersedge', notes: '' },
+        { date: '2025-06-18', temp: 21.0, time: 58.31, dist: 1600, location: 'Watersedge', notes: 'Long Swim' },
         { date: '2025-06-21', temp: 24.5, time: 38.50, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-06-25', temp: 23.0, time: 35.45, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-06-28', temp: 23.2, time: 45.08, dist: 1000, location: 'Watersedge', notes: '' },
-        { date: '2025-06-30', temp: 28.0, time: 49.16, dist: 1000, location: 'Watersedge', notes: '' },
+        { date: '2025-06-30', temp: 28.0, time: 49.16, dist: 1000, location: 'Watersedge', notes: 'Hottest' },
         { date: '2025-07-02', temp: 24.0, time: 35.05, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-07-11', temp: 23.4, time: 47.08, dist: 1083, location: 'Watersedge', notes: '' },
         { date: '2025-07-13', temp: 24.5, time: 55.17, dist: 1200, location: 'Watersedge', notes: '' },
@@ -228,6 +250,18 @@
 
     let swims = JSON.parse(localStorage.getItem('mySwims')) || fullMasterHistory;
 
+    function previewImage(input) {
+        const preview = document.getElementById('photoPreview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     function saveEntry() {
         const idx = parseInt(document.getElementById('editIndex').value);
         const file = document.getElementById('inPhoto').files[0];
@@ -245,11 +279,8 @@
 
             if(!entry.date || isNaN(entry.temp)) return alert("Please fill in Date and Temp!");
 
-            if(idx === -1) {
-                swims.push(entry);
-            } else {
-                swims[idx] = entry;
-            }
+            if(idx === -1) { swims.push(entry); } 
+            else { swims[idx] = entry; }
 
             localStorage.setItem('mySwims', JSON.stringify(swims));
             cancelEdit();
@@ -272,7 +303,10 @@
         document.getElementById('inTime').value = s.time;
         document.getElementById('inDist').value = s.dist;
         document.getElementById('inNotes').value = s.notes || '';
-        
+        if(s.photo) {
+            document.getElementById('photoPreview').src = s.photo;
+            document.getElementById('photoPreview').style.display = 'block';
+        }
         document.getElementById('formTitle').innerText = "Editing Swim Record...";
         document.getElementById('submitBtn').innerText = "💾 Update Record";
         document.getElementById('submitBtn').classList.add('btn-update');
@@ -288,6 +322,7 @@
         document.getElementById('submitBtn').classList.remove('btn-update');
         document.getElementById('cancelBtn').style.display = "none";
         document.getElementById('inputCard').classList.remove('editing-mode');
+        document.getElementById('photoPreview').style.display = 'none';
         document.querySelectorAll('input, select, textarea').forEach(i => i.value = '');
         document.getElementById('inDate').value = new Date().toISOString().split('T')[0];
     }
@@ -303,11 +338,11 @@
             
             const d = new Date(s.date);
             const ukDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const photoHtml = s.photo ? `<img src="${s.photo}" style="max-width:50px; border-radius:5px; cursor:pointer;" onclick="window.open(this.src)">` : '➖';
+            const photoHtml = s.photo ? `<img src="${s.photo}" class="swim-img" onclick="window.open(this.src)">` : '➖';
 
             body.innerHTML += `<tr>
                 <td>${photoHtml}</td>
-                <td><b>${ukDate}</b><span class="loc-tag">${s.location || 'Watersedge'}</span></td>
+                <td><b>${ukDate}</b><span class="loc-tag">${s.location || '-'}</span></td>
                 <td><span class="temp-pill">${s.temp.toFixed(1)}°C</span></td>
                 <td>${s.dist}m / ${s.time}m</td>
                 <td><small>${s.notes || '-'}</small></td>
@@ -325,7 +360,7 @@
     }
 
     function hardReset() {
-        if(confirm("Factory Reset: This will clear added swims and load all 116 records from your notebooks. Continue?")) {
+        if(confirm("Factory Reset: Clear and reload all 116 records?")) {
             localStorage.setItem('mySwims', JSON.stringify(fullMasterHistory));
             swims = [...fullMasterHistory];
             renderTable();

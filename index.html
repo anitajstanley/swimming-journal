@@ -25,7 +25,7 @@
         label { font-weight: 600; font-size: 0.8rem; color: var(--primary); }
         input, select, textarea { padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-size: 1rem; outline: none; }
         .file-label { background: #f8fafc; border: 2px dashed #cbd5e0; padding: 10px; border-radius: 10px; cursor: pointer; text-align: center; }
-        .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1.1rem; margin-top: 10px; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1.1rem; margin-top: 10px; width: 100%; }
         .btn-add:hover { background: var(--dark); transform: translateY(-2px); }
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-box { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--secondary); }
@@ -35,10 +35,11 @@
         td { padding: 15px; border-top: 1px solid #f1f5f9; vertical-align: top; }
         .temp-pill { background: var(--light); padding: 4px 8px; border-radius: 6px; font-weight: bold; }
         .loc-tag { display: block; font-size: 0.75rem; color: #666; margin-top: 4px; font-weight: 600; }
-        .swim-img { max-width: 60px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .swim-img:hover { transform: scale(1.1); }
+        .swim-img { max-width: 60px; border-radius: 6px; cursor: pointer; }
         .btn-del { color: #ccc; cursor: pointer; border: none; background: none; font-size: 1.2rem; }
         .btn-del:hover { color: var(--accent); }
+        .footer-tools { margin-top: 50px; text-align: center; opacity: 0.5; }
+        .btn-reset { background: none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -79,11 +80,14 @@
         <thead><tr><th>Photo</th><th>Date / Location</th><th>Temp</th><th>Stats</th><th>Notes</th><th></th></tr></thead>
         <tbody id="journalBody"></tbody>
     </table>
+
+    <div class="footer-tools">
+        <button class="btn-reset" onclick="resetData()">Clear & Load Master History</button>
+    </div>
 </div>
 
 <script>
-    const initialData = [
-        // 2024
+    const masterHistory = [
         { date: '2024-02-02', temp: 6.3, time: 24.00, dist: 450, location: 'Watersedge', notes: 'Wetsuit' },
         { date: '2024-02-16', temp: 9.5, time: 28.27, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
         { date: '2024-02-18', temp: 10.0, time: 18.07, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
@@ -142,7 +146,6 @@
         { date: '2024-12-15', temp: 5.7, time: 10.39, dist: 200, location: 'Watersedge', notes: 'Wetsuit' },
         { date: '2024-12-24', temp: 6.0, time: 16.47, dist: 200, location: 'Watersedge', notes: 'Wetsuit' },
         { date: '2024-12-28', temp: 6.6, time: 15.16, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
-        // 2025
         { date: '2025-01-01', temp: 7.2, time: 16.22, dist: 300, location: 'Watersedge', notes: '' },
         { date: '2025-01-07', temp: 5.2, time: 9.58, dist: 200, location: 'Watersedge', notes: '' },
         { date: '2025-01-12', temp: 3.9, time: 8.00, dist: 150, location: 'Watersedge', notes: 'Approx' },
@@ -207,22 +210,22 @@
         { date: '2025-10-23', temp: 12.9, time: 25.50, dist: 500, location: 'Watersedge', notes: '' },
         { date: '2025-10-26', temp: 11.3, time: 20.40, dist: 400, location: 'Watersedge', notes: '' },
         { date: '2025-10-31', temp: 10.0, time: 10.10, dist: 150, location: 'Watersedge', notes: '' },
-        { date: '2025-11-02', temp: 9.0,  time: 24.57, dist: 600, location: 'Watersedge', notes: '' },
+        { date: '2025-11-02', temp: 9.0, time: 24.57, dist: 600, location: 'Watersedge', notes: '' },
         { date: '2025-11-09', temp: 11.5, time: 25.00, dist: 500, location: 'Watersedge', notes: '' },
         { date: '2025-11-14', temp: 11.2, time: 17.17, dist: 400, location: 'Watersedge', notes: '' },
-        { date: '2025-11-19', temp: 7.6,  time: 8.31,  dist: 180, location: 'Watersedge', notes: '' },
-        { date: '2025-11-22', temp: 6.4,  time: 9.30,  dist: 200, location: 'Watersedge', notes: '' },
-        { date: '2025-11-26', temp: 3.9,  time: 11.11, dist: 220, location: 'Watersedge', notes: 'Brrr!' },
-        { date: '2025-11-30', temp: 6.5,  time: 9.40,  dist: 200, location: 'Watersedge', notes: '' },
-        { date: '2025-12-03', temp: 6.1,  time: 16.17, dist: 300, location: 'Watersedge', notes: '' },
-        { date: '2025-12-07', temp: 6.5,  time: 12.50, dist: 250, location: 'Watersedge', notes: '' },
-        { date: '2025-12-14', temp: 6.5,  time: 13.00, dist: 250, location: 'Watersedge', notes: '' },
-        { date: '2025-12-17', temp: 5.5,  time: 15.16, dist: 300, location: 'Watersedge', notes: '' },
-        { date: '2025-12-21', temp: 7.5,  time: 16.44, dist: 250, location: 'Watersedge', notes: '' },
-        { date: '2025-12-28', temp: 5.5,  time: 10.10, dist: 200, location: 'Watersedge', notes: '' }
+        { date: '2025-11-19', temp: 7.6, time: 8.31, dist: 180, location: 'Watersedge', notes: '' },
+        { date: '2025-11-22', temp: 6.4, time: 9.30, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-11-26', temp: 3.9, time: 11.11, dist: 220, location: 'Watersedge', notes: 'Brrr!' },
+        { date: '2025-11-30', temp: 6.5, time: 9.40, dist: 200, location: 'Watersedge', notes: '' },
+        { date: '2025-12-03', temp: 6.1, time: 16.17, dist: 300, location: 'Watersedge', notes: '' },
+        { date: '2025-12-07', temp: 6.5, time: 12.50, dist: 250, location: 'Watersedge', notes: '' },
+        { date: '2025-12-14', temp: 6.5, time: 13.00, dist: 250, location: 'Watersedge', notes: '' },
+        { date: '2025-12-17', temp: 5.5, time: 15.16, dist: 300, location: 'Watersedge', notes: '' },
+        { date: '2025-12-21', temp: 7.5, time: 16.44, dist: 250, location: 'Watersedge', notes: '' },
+        { date: '2025-12-28', temp: 5.5, time: 10.10, dist: 200, location: 'Watersedge', notes: '' }
     ];
 
-    let swims = JSON.parse(localStorage.getItem('mySwims')) || initialData;
+    let swims = JSON.parse(localStorage.getItem('mySwims')) || masterHistory;
 
     function saveEntry() {
         const file = document.getElementById('inPhoto').files[0];
@@ -232,8 +235,8 @@
                 temp: parseFloat(document.getElementById('inTemp').value),
                 time: parseFloat(document.getElementById('inTime').value) || 0,
                 dist: parseInt(document.getElementById('inDist').value) || 0,
-                location: document.getElementById('inLocation').value,
-                notes: document.getElementById('inNotes').value,
+                location: document.getElementById('inLocation').value || 'Watersedge',
+                notes: document.getElementById('inNotes').value || '',
                 photo: imgBase64 || null
             };
             if(!entry.date || isNaN(entry.temp)) return alert("Date and Temp are required!");
@@ -241,6 +244,7 @@
             localStorage.setItem('mySwims', JSON.stringify(swims));
             renderTable();
             document.querySelectorAll('input, select, textarea').forEach(i => i.value = '');
+            document.getElementById('inDate').value = new Date().toISOString().split('T')[0];
         };
         if (file) {
             const reader = new FileReader();
@@ -253,24 +257,44 @@
         const body = document.getElementById('journalBody');
         body.innerHTML = '';
         let totalD = 0; let totalT = 0; let cold = 100;
+        
         swims.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach((s, idx) => {
-            totalD += s.dist; totalT += s.temp; if(s.temp < cold) cold = s.temp;
+            totalD += (s.dist || 0);
+            totalT += (s.temp || 0);
+            if(s.temp < cold) cold = s.temp;
+            
+            // Fix "undefined" display
+            const loc = s.location || '-';
+            const noteText = s.notes || '-';
+            const photoHtml = s.photo ? `<img src="${s.photo}" class="swim-img" onclick="window.open(this.src)">` : '➖';
+
             body.innerHTML += `<tr>
-                <td>${s.photo ? `<img src="${s.photo}" class="swim-img" onclick="window.open(this.src)">` : '➖'}</td>
-                <td><b>${s.date}</b><span class="loc-tag">${s.location}</span></td>
+                <td>${photoHtml}</td>
+                <td><b>${s.date}</b><span class="loc-tag">${loc}</span></td>
                 <td><span class="temp-pill">${s.temp.toFixed(1)}°C</span></td>
                 <td>${s.dist}m / ${s.time}m</td>
-                <td><small>${s.notes}</small></td>
+                <td><small>${noteText}</small></td>
                 <td><button class="btn-del" onclick="deleteEntry(${idx})">×</button></td>
             </tr>`;
         });
-        document.getElementById('stCount').innerText = swims.length;
+        
+        const count = swims.length;
+        document.getElementById('stCount').innerText = count;
         document.getElementById('stDist').innerText = (totalD / 1000).toFixed(1) + "km";
-        document.getElementById('stTemp').innerText = (totalT / swims.length).toFixed(1) + "°C";
-        document.getElementById('stCold').innerText = (cold === 100 ? 0 : cold).toFixed(1) + "°C";
+        document.getElementById('stTemp').innerText = count > 0 ? (totalT / count).toFixed(1) + "°C" : "0°C";
+        document.getElementById('stCold').innerText = count > 0 ? cold.toFixed(1) + "°C" : "0°C";
+    }
+
+    function resetData() {
+        if(confirm("This will clear your added swims and reload the 116 master records. Continue?")) {
+            localStorage.setItem('mySwims', JSON.stringify(masterHistory));
+            swims = masterHistory;
+            renderTable();
+        }
     }
 
     function deleteEntry(i) { if(confirm("Delete this?")) { swims.splice(i,1); localStorage.setItem('mySwims', JSON.stringify(swims)); renderTable(); } }
+    
     document.getElementById('inDate').value = new Date().toISOString().split('T')[0];
     renderTable();
 </script>

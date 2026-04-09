@@ -3,53 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Water Collective | My Journal</title>
+    <title>Open Water Collective | Insights Journal</title>
     <style>
         :root {
             --primary: #0077b6; --secondary: #00b4d8; --dark: #03045e;
-            --light: #caf0f8; --accent: #ff4d4d; --white: #ffffff;
+            --light: #caf0f8; --accent: #ff4d4d; --white: #ffffff; --warm: #fb8500;
         }
         body {
             font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f0f9ff 0%, #cbebff 100%);
             margin: 0; padding: 20px; color: var(--dark); min-height: 100vh;
         }
-        .container { max-width: 1100px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
         header {
             text-align: center; padding: 20px 0; background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 25px;
         }
         .input-card { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 25px; border: 2px solid transparent; transition: 0.3s; }
-        .editing-mode { border-color: var(--secondary); background: #f0fbff; box-shadow: 0 0 20px rgba(0,180,216,0.2); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; align-items: end; }
+        .editing-mode { border-color: var(--secondary); background: #f0fbff; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; align-items: end; }
         .field { display: flex; flex-direction: column; gap: 5px; }
         .span-full { grid-column: 1 / -1; }
         label { font-weight: 600; font-size: 0.8rem; color: var(--primary); }
         input, select, textarea { padding: 12px; border: 2px solid #edf2f7; border-radius: 10px; font-size: 1rem; outline: none; }
         
-        /* Photo Upload Styling */
-        .photo-upload-area { display: flex; align-items: center; gap: 15px; }
-        .file-label { background: #f8fafc; border: 2px dashed #cbd5e0; padding: 10px; border-radius: 10px; cursor: pointer; text-align: center; flex-grow: 1; font-size: 0.9rem; }
-        #photoPreview { height: 45px; width: 45px; border-radius: 8px; object-fit: cover; display: none; border: 1px solid #ddd; }
+        .photo-upload-area { display: flex; align-items: center; gap: 10px; }
+        #photoPreview { height: 40px; width: 40px; border-radius: 5px; object-fit: cover; display: none; }
+        .file-label { background: #f8fafc; border: 1px solid #cbd5e0; padding: 10px; border-radius: 10px; cursor: pointer; flex-grow: 1; text-align: center; font-size: 0.8rem; }
 
         .btn-add { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1.1rem; width: 100%; margin-top: 10px; }
         .btn-add:hover { background: var(--dark); transform: translateY(-2px); }
-        .btn-update { background: #2a9d8f; }
 
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-box { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--secondary); }
-        .stat-val { display: block; font-size: 1.6rem; font-weight: 800; }
+        /* Stats Dashboard */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--white); padding: 15px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .stat-val { display: block; font-size: 1.4rem; font-weight: 800; margin-bottom: 2px; }
+        .stat-label { font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Insights Panel */
+        .insights-row { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 25px; }
+        .insight-card { background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.04); }
+        .insight-card h3 { margin: 0 0 15px 0; font-size: 1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
         
+        .month-stat { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        .month-stat:last-child { border: none; }
+
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.8rem; color: var(--primary); text-transform: uppercase; }
-        td { padding: 15px; border-top: 1px solid #f1f5f9; vertical-align: top; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; }
+        td { padding: 12px 15px; border-top: 1px solid #f1f5f9; vertical-align: middle; }
         
-        .temp-pill { background: var(--light); padding: 4px 8px; border-radius: 6px; font-weight: bold; }
-        .loc-tag { display: block; font-size: 0.75rem; color: #666; margin-top: 4px; font-weight: 600; }
-        .swim-img { max-width: 60px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .btn-action { cursor: pointer; border: none; background: none; font-size: 1rem; margin-right: 10px; opacity: 0.5; }
-        .btn-action:hover { opacity: 1; }
-        .footer-tools { margin-top: 40px; text-align: center; }
-        .btn-reset { background: none; border: 1px solid #ccc; color: #999; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.7rem; }
+        .temp-pill { background: var(--light); padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
+        .btn-action { cursor: pointer; border: none; background: none; font-size: 1rem; opacity: 0.4; transition: 0.2s; }
+        .btn-action:hover { opacity: 1; transform: scale(1.2); }
+
+        @media (max-width: 800px) {
+            .insights-row { grid-template-columns: 1fr; }
+            th:nth-child(4), td:nth-child(4) { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -58,7 +68,7 @@
     <header><h1>🏊‍♂️ My Collective Journal</h1></header>
 
     <div class="input-card" id="inputCard">
-        <h3 id="formTitle" style="margin-top:0; font-size: 1rem; color: var(--secondary);">Log New Swim</h3>
+        <h3 id="formTitle" style="margin: 0 0 15px 0; color: var(--primary);">Log New Swim</h3>
         <div class="form-grid">
             <input type="hidden" id="editIndex" value="-1">
             <div class="field"><label>Date</label><input type="date" id="inDate"></div>
@@ -73,44 +83,56 @@
                 </select>
             </div>
             <div class="field"><label>Temp °C</label><input type="number" id="inTemp" step="0.1"></div>
-            <div class="field"><label>Time (mm.ss)</label><input type="number" id="inTime" step="0.01"></div>
+            <div class="field"><label>Time (min.sec)</label><input type="number" id="inTime" step="0.01"></div>
             <div class="field"><label>Dist (m)</label><input type="number" id="inDist"></div>
-            
             <div class="field">
                 <label>Photo</label>
                 <div class="photo-upload-area">
                     <img id="photoPreview" src="">
-                    <label for="inPhoto" class="file-label">📸 Choose Photo</label>
+                    <label for="inPhoto" class="file-label">📸 Choose</label>
                     <input type="file" id="inPhoto" hidden accept="image/*" onchange="previewImage(this)">
                 </div>
             </div>
-
-            <div class="field span-full"><label>Swim Notes</label><textarea id="inNotes"></textarea></div>
-            <button class="btn-add" id="submitBtn" onclick="saveEntry()">✅ Log This Swim</button>
-            <button class="btn-add" id="cancelBtn" style="display:none; background:#ccc; margin-top:10px;" onclick="cancelEdit()">Cancel Edit</button>
+            <div class="field span-full"><label>Journal Notes</label><textarea id="inNotes" placeholder="Memories, weather, or gear..."></textarea></div>
+            <button class="btn-add span-full" id="submitBtn" onclick="saveEntry()">✅ Save Swim</button>
+            <button class="btn-add span-full" id="cancelBtn" style="display:none; background:#ccc;" onclick="cancelEdit()">Cancel Edit</button>
         </div>
     </div>
 
-    <div class="stats-row">
+    <div class="stats-grid">
         <div class="stat-box"><span class="stat-val" id="stCount">0</span><span class="stat-label">Total Swims</span></div>
         <div class="stat-box"><span class="stat-val" id="stDist">0</span><span class="stat-label">Total KM</span></div>
-        <div class="stat-box"><span class="stat-val" id="stTemp">0</span><span class="stat-label">Avg Temp</span></div>
-        <div class="stat-box" style="border-color: var(--accent);"><span class="stat-val" id="stCold">0</span><span class="stat-label">Coldest</span></div>
+        <div class="stat-box" style="border-color: var(--accent);"><span class="stat-val" id="stCold">0</span><span class="stat-label">Coldest Dip</span></div>
+        <div class="stat-box" style="border-color: var(--warm);"><span class="stat-val" id="stWarm">0</span><span class="stat-label">Warmest Dip</span></div>
+        <div class="stat-box" style="border-color: #2a9d8f;"><span class="stat-val" id="stLong">0</span><span class="stat-label">Longest (min)</span></div>
+    </div>
+
+    <div class="insights-row">
+        <div class="insight-card">
+            <h3>📊 Monthly Volume</h3>
+            <div id="monthlyStats"></div>
+        </div>
+        <div class="insight-card">
+            <h3>💡 Dynamic Facts</h3>
+            <div id="dynamicFacts" style="font-size: 0.9rem; line-height: 1.6; color: #444;">
+                Add more swims to unlock deeper insights!
+            </div>
+        </div>
     </div>
 
     <table>
-        <thead><tr><th>Photo</th><th>Date / Location</th><th>Temp</th><th>Stats</th><th>Notes</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Photo</th><th>Date & Location</th><th>Temp</th><th>Time</th><th>Dist</th><th>Notes</th><th></th></tr></thead>
         <tbody id="journalBody"></tbody>
     </table>
 
-    <div class="footer-tools">
-        <button class="btn-reset" onclick="hardReset()">Reset to Master Notebook Data</button>
+    <div style="text-align:center; padding: 40px 0;">
+        <button onclick="hardReset()" style="background:none; border:none; color:#aaa; font-size:0.7rem; cursor:pointer; text-decoration:underline;">Restore 116 Original Records</button>
     </div>
 </div>
 
 <script>
-    // COMPLETE MASTER DATA (2024-2025)
-    const fullMasterHistory = [
+    // Include the 116 Master History records here
+    const masterHistory = [
         { date: '2024-02-02', temp: 6.3, time: 24.00, dist: 450, location: 'Watersedge', notes: 'Wetsuit' },
         { date: '2024-02-16', temp: 9.5, time: 28.27, dist: 600, location: 'Watersedge', notes: 'Wetsuit' },
         { date: '2024-02-18', temp: 10.0, time: 18.07, dist: 300, location: 'Watersedge', notes: 'Wetsuit' },
@@ -248,7 +270,7 @@
         { date: '2025-12-28', temp: 5.5, time: 10.10, dist: 200, location: 'Watersedge', notes: '' }
     ];
 
-    let swims = JSON.parse(localStorage.getItem('mySwims')) || fullMasterHistory;
+    let swims = JSON.parse(localStorage.getItem('mySwims')) || masterHistory;
 
     function previewImage(input) {
         const preview = document.getElementById('photoPreview');
@@ -318,7 +340,7 @@
     function cancelEdit() {
         document.getElementById('editIndex').value = "-1";
         document.getElementById('formTitle').innerText = "Log New Swim";
-        document.getElementById('submitBtn').innerText = "✅ Log This Swim";
+        document.getElementById('submitBtn').innerText = "✅ Save Swim";
         document.getElementById('submitBtn').classList.remove('btn-update');
         document.getElementById('cancelBtn').style.display = "none";
         document.getElementById('inputCard').classList.remove('editing-mode');
@@ -330,21 +352,33 @@
     function renderTable() {
         const body = document.getElementById('journalBody');
         body.innerHTML = '';
-        let totalD = 0; let totalT = 0; let cold = 100;
+        let totalD = 0; let totalT = 0; let cold = 100; let warm = 0; let long = 0;
         
+        // Dynamic Insights Data
+        const monthlyVolume = {};
+
         swims.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach((s, idx) => {
             totalD += (s.dist || 0); totalT += (s.temp || 0);
             if(s.temp < cold) cold = s.temp;
+            if(s.temp > warm) warm = s.temp;
+            if(s.time > long) long = s.time;
             
+            // Format UK Date: DD MMM YYYY
             const d = new Date(s.date);
-            const ukDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const ukDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            
+            // Monthly stats tracking
+            const mKey = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+            monthlyVolume[mKey] = (monthlyVolume[mKey] || 0) + 1;
+
             const photoHtml = s.photo ? `<img src="${s.photo}" class="swim-img" onclick="window.open(this.src)">` : '➖';
 
             body.innerHTML += `<tr>
                 <td>${photoHtml}</td>
                 <td><b>${ukDate}</b><span class="loc-tag">${s.location || '-'}</span></td>
                 <td><span class="temp-pill">${s.temp.toFixed(1)}°C</span></td>
-                <td>${s.dist}m / ${s.time}m</td>
+                <td>${s.time}m</td>
+                <td>${s.dist}m</td>
                 <td><small>${s.notes || '-'}</small></td>
                 <td>
                     <button class="btn-action" onclick="editEntry(${idx})">✏️</button>
@@ -353,16 +387,34 @@
             </tr>`;
         });
         
+        // Update Dashboard
         document.getElementById('stCount').innerText = swims.length;
         document.getElementById('stDist').innerText = (totalD / 1000).toFixed(1) + "km";
-        document.getElementById('stTemp').innerText = swims.length ? (totalT / swims.length).toFixed(1) + "°C" : "0°C";
         document.getElementById('stCold').innerText = swims.length ? cold.toFixed(1) + "°C" : "0°C";
+        document.getElementById('stWarm').innerText = swims.length ? warm.toFixed(1) + "°C" : "0°C";
+        document.getElementById('stLong').innerText = long;
+
+        // Render Monthly Volume Insight
+        const mHtml = Object.entries(monthlyVolume).slice(0, 6).map(([mon, count]) => 
+            `<div class="month-stat"><span>${mon}</span><strong>${count} swims</strong></div>`).join('');
+        document.getElementById('monthlyStats').innerHTML = mHtml || 'No data yet.';
+
+        // Dynamic Facts
+        const facts = document.getElementById('dynamicFacts');
+        if (swims.length > 0) {
+            const avgDist = (totalD / swims.length).toFixed(0);
+            facts.innerHTML = `
+                • Your average swim distance is <strong>${avgDist}m</strong>.<br>
+                • You've swam in a range of <strong>${(warm - cold).toFixed(1)}°C</strong> across the year.<br>
+                • You have logged <strong>${swims.length}</strong> total adventures!
+            `;
+        }
     }
 
     function hardReset() {
         if(confirm("Factory Reset: Clear and reload all 116 records?")) {
-            localStorage.setItem('mySwims', JSON.stringify(fullMasterHistory));
-            swims = [...fullMasterHistory];
+            localStorage.setItem('mySwims', JSON.stringify(masterHistory));
+            swims = [...masterHistory];
             renderTable();
         }
     }

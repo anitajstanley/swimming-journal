@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Water Collective | My Journal</title>
+    <title>Open Water Collective | Analytics Journal</title>
     <style>
         :root {
             --primary: #0077b6; --secondary: #00b4d8; --dark: #03045e;
@@ -18,15 +18,15 @@
             text-align: center; padding: 20px 0; background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 20px;
         }
-        .input-card { background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; border: 2px solid transparent; }
+        .input-card { background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .editing-mode { border-color: var(--secondary); background: #f0fbff; box-shadow: 0 0 20px rgba(0,180,216,0.2); }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; align-items: end; }
         .field { display: flex; flex-direction: column; gap: 4px; }
         .span-full { grid-column: 1 / -1; }
         label { font-weight: 600; font-size: 0.75rem; color: var(--primary); }
         input, select, textarea { padding: 10px; border: 2px solid #edf2f7; border-radius: 8px; font-size: 0.9rem; outline: none; }
-        .file-label { background: #f8fafc; border: 1px solid #cbd5e0; padding: 8px; border-radius: 8px; cursor: pointer; flex-grow: 1; text-align: center; font-size: 0.8rem; }
-        .btn-add { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; width: 100%; margin-top: 10px; }
+        .file-label { background: #f8fafc; border: 1px solid #cbd5e0; padding: 8px; border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.8rem; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
         .btn-update { background: #2a9d8f; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
@@ -40,17 +40,19 @@
         .month-stat { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; }
 
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.7rem; color: var(--primary); text-transform: uppercase; }
+        th { background: #f8fafc; padding: 12px; text-align: left; font-size: 0.7rem; color: var(--primary); text-transform: uppercase; cursor: pointer; user-select: none; }
+        th:hover { background: #e0f2f1; }
         td { padding: 10px 12px; border-top: 1px solid #f1f5f9; vertical-align: middle; font-size: 0.85rem; }
         .temp-pill { background: var(--light); padding: 3px 6px; border-radius: 4px; font-weight: bold; }
         .loc-tag { display: block; font-size: 0.7rem; color: #666; font-weight: 600; }
         .map-link { color: #2a9d8f; text-decoration: none; margin-left: 4px; }
         .swim-img { max-width: 50px; border-radius: 4px; cursor: pointer; }
         .btn-action { cursor: pointer; border: none; background: none; font-size: 0.9rem; opacity: 0.4; margin-right: 5px; }
-        .btn-action:hover { opacity: 1; transform: scale(1.1); }
+        .btn-action:hover { opacity: 1; }
         .footer { text-align: center; padding: 30px 0; opacity: 0.3; font-size: 0.7rem; }
+        .sort-icon { font-size: 0.6rem; margin-left: 3px; color: #ccc; }
 
-        @media (max-width: 800px) { .insights-row { grid-template-columns: 1fr; } }
+        @media (max-width: 800px) { .insights-row { grid-template-columns: 1fr; } th:nth-child(4), td:nth-child(4) { display: none; } }
     </style>
 </head>
 <body>
@@ -79,12 +81,12 @@
             <div class="field">
                 <label>Photo</label>
                 <div class="photo-upload-area">
-                    <img id="photoPreview" src="" style="height:35px; width:35px; border-radius:5px; display:none;">
+                    <img id="photoPreview" src="" style="height:30px; width:30px; border-radius:5px; display:none; object-fit:cover;">
                     <label for="inPhoto" class="file-label">📸 Choose</label>
                     <input type="file" id="inPhoto" hidden accept="image/*" onchange="previewImage(this)">
                 </div>
             </div>
-            <div class="field span-full"><label>Journal Notes</label><textarea id="inNotes" rows="2"></textarea></div>
+            <div class="field span-full"><label>Swim Notes</label><textarea id="inNotes" rows="2"></textarea></div>
             <button class="btn-add span-full" id="submitBtn" onclick="saveEntry()">✅ Save Swim</button>
             <button class="btn-add span-full" id="cancelBtn" style="display:none; background:#ccc;" onclick="cancelEdit()">Cancel Edit</button>
         </div>
@@ -99,16 +101,26 @@
 
     <div class="insights-row">
         <div class="insight-card"><h3>📊 Monthly Swims</h3><div id="monthlyStats"></div></div>
-        <div class="insight-card"><h3>💡 Dynamic Facts</h3><div id="dynamicFacts" style="font-size: 0.85rem; color: #444; line-height:1.5;"></div></div>
+        <div class="insight-card"><h3>💡 Dynamic Facts</h3><div id="dynamicFacts"></div></div>
     </div>
 
     <table>
-        <thead><tr><th>Photo</th><th>Date & Location</th><th>Temp</th><th>Time / Dist</th><th>Notes</th><th></th></tr></thead>
+        <thead>
+            <tr>
+                <th onclick="sortSwims('photo')">Photo <span id="sort-photo" class="sort-icon"></span></th>
+                <th onclick="sortSwims('date')">Date & Loc <span id="sort-date" class="sort-icon"></span></th>
+                <th onclick="sortSwims('temp')">Temp <span id="sort-temp" class="sort-icon"></span></th>
+                <th onclick="sortSwims('time')">Time <span id="sort-time" class="sort-icon"></span></th>
+                <th onclick="sortSwims('dist')">Dist <span id="sort-dist" class="sort-icon"></span></th>
+                <th>Notes</th>
+                <th></th>
+            </tr>
+        </thead>
         <tbody id="journalBody"></tbody>
     </table>
 
     <div class="footer">
-        <button onclick="hardReset()" style="cursor:pointer; background:none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; color: #666;">Factory Reset (Restore 116 records)</button>
+        <button onclick="hardReset()" style="cursor:pointer; background:none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; color: #666;">Reload 116 Notebook Swims</button>
     </div>
 </div>
 
@@ -212,11 +224,11 @@
         { date: '2025-06-01', temp: 19.0, time: 29.59, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-06-06', temp: 18.1, time: 32.15, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-06-10', temp: 18.5, time: 30.31, dist: 800, location: 'Watersedge', notes: '' },
-        { date: '2025-06-18', temp: 21.0, time: 58.31, dist: 1600, location: 'Watersedge', notes: '' },
+        { date: '2025-06-18', temp: 21.0, time: 58.31, dist: 1600, location: 'Watersedge', notes: 'Long Swim' },
         { date: '2025-06-21', temp: 24.5, time: 38.50, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-06-25', temp: 23.0, time: 35.45, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-06-28', temp: 23.2, time: 45.08, dist: 1000, location: 'Watersedge', notes: '' },
-        { date: '2025-06-30', temp: 28.0, time: 49.16, dist: 1000, location: 'Watersedge', notes: '' },
+        { date: '2025-06-30', temp: 28.0, time: 49.16, dist: 1000, location: 'Watersedge', notes: 'Hottest' },
         { date: '2025-07-02', temp: 24.0, time: 35.05, dist: 800, location: 'Watersedge', notes: '' },
         { date: '2025-07-11', temp: 23.4, time: 47.08, dist: 1083, location: 'Watersedge', notes: '' },
         { date: '2025-07-13', temp: 24.5, time: 55.17, dist: 1200, location: 'Watersedge', notes: '' },
@@ -259,7 +271,17 @@
         { date: '2025-12-28', temp: 5.5, time: 10.10, dist: 200, location: 'Watersedge', notes: '' }
     ];
 
-    let swims = JSON.parse(localStorage.getItem('mySwims')) || fullMasterHistory;
+    let currentSort = { key: 'date', asc: false };
+    let swims = JSON.parse(localStorage.getItem('mySwims')) || [...fullMasterHistory];
+
+    function previewImage(input) {
+        const preview = document.getElementById('photoPreview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 
     function saveEntry() {
         const idx = parseInt(document.getElementById('editIndex').value);
@@ -283,42 +305,34 @@
         else process(null);
     }
 
-    function editEntry(idx) {
-        const s = swims[idx];
-        document.getElementById('editIndex').value = idx;
-        document.getElementById('inDate').value = s.date;
-        document.getElementById('inLocation').value = s.location || 'Watersedge';
-        document.getElementById('inTemp').value = s.temp;
-        document.getElementById('inTime').value = s.time;
-        document.getElementById('inDist').value = s.dist;
-        document.getElementById('inNotes').value = s.notes || '';
-        document.getElementById('formTitle').innerText = "✏️ Editing Record...";
-        document.getElementById('submitBtn').innerText = "Update Record";
-        document.getElementById('submitBtn').classList.add('btn-update');
-        document.getElementById('cancelBtn').style.display = "block";
-        document.getElementById('inputCard').classList.add('editing-mode');
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-
-    function cancelEdit() {
-        document.getElementById('editIndex').value = "-1";
-        document.getElementById('formTitle').innerText = "Log New Swim";
-        document.getElementById('submitBtn').innerText = "✅ Save Swim";
-        document.getElementById('submitBtn').classList.remove('btn-update');
-        document.getElementById('cancelBtn').style.display = "none";
-        document.getElementById('inputCard').classList.remove('editing-mode');
-        document.getElementById('photoPreview').style.display = 'none';
-        document.querySelectorAll('input, select, textarea').forEach(i => i.value = '');
+    function sortSwims(key) {
+        if(currentSort.key === key) currentSort.asc = !currentSort.asc;
+        else { currentSort.key = key; currentSort.asc = true; }
+        
+        // Update visual icons
+        document.querySelectorAll('.sort-icon').forEach(el => el.innerHTML = '');
+        document.getElementById('sort-' + key).innerHTML = currentSort.asc ? ' ↑' : ' ↓';
+        
+        renderTable();
     }
 
     function renderTable() {
         const body = document.getElementById('journalBody');
-        const monthlyContainer = document.getElementById('monthlyStats');
         body.innerHTML = '';
         let totalD = 0, totalT = 0, cold = 100, warm = 0;
         const monthlyVolume = {};
 
-        swims.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach((s, idx) => {
+        // Application of Sorting
+        swims.sort((a, b) => {
+            let valA = a[currentSort.key];
+            let valB = b[currentSort.key];
+            if(currentSort.key === 'date') { valA = new Date(valA); valB = new Date(valB); }
+            if(valA < valB) return currentSort.asc ? -1 : 1;
+            if(valA > valB) return currentSort.asc ? 1 : -1;
+            return 0;
+        });
+
+        swims.forEach((s, idx) => {
             totalD += (s.dist || 0); totalT += (s.temp || 0);
             if(s.temp < cold) cold = s.temp; if(s.temp > warm) warm = s.temp;
             
@@ -334,7 +348,8 @@
                 <td>${photoHtml}</td>
                 <td><div style="margin-bottom:4px;"><b>${ukDate}</b></div><span class="loc-tag">${s.location || '-'} <a href="${mapUrl}" target="_blank" class="map-link">📍</a></span></td>
                 <td><span class="temp-pill">${s.temp.toFixed(1)}°C</span></td>
-                <td>${s.time}m / ${s.dist}m</td>
+                <td>${s.time}m</td>
+                <td>${s.dist}m</td>
                 <td><small>${s.notes || '-'}</small></td>
                 <td><button class="btn-action" onclick="editEntry(${idx})">✏️</button><button class="btn-action" onclick="deleteEntry(${idx})">🗑️</button></td>
             </tr>`;
@@ -346,29 +361,41 @@
         document.getElementById('stWarm').innerText = swims.length ? warm.toFixed(1) + "°C" : "0°C";
 
         // Monthly Insights
-        monthlyContainer.innerHTML = Object.entries(monthlyVolume).slice(0, 5).map(([m, c]) => 
+        document.getElementById('monthlyStats').innerHTML = Object.entries(monthlyVolume).slice(0, 5).map(([m, c]) => 
             `<div class="month-stat"><span>${m}</span><strong>${c} swims</strong></div>`).join('');
 
         // Dynamic Facts
         const avg = (totalD / swims.length).toFixed(0);
-        document.getElementById('dynamicFacts').innerHTML = `
-            • Average swim distance: <strong>${avg}m</strong>.<br>
-            • Temperature range braved: <strong>${(warm - cold).toFixed(1)}°C</strong>.<br>
-            • Most active location: <strong>Watersedge</strong>.
-        `;
+        document.getElementById('dynamicFacts').innerHTML = `<p style="margin:0;">• Average distance: <strong>${avg}m</strong>.<br>• Temperature range: <strong>${(warm - cold).toFixed(1)}°C</strong>.<br>• Consistency: You swim ~<strong>${(swims.length / 24).toFixed(1)}</strong> times per month.</p>`;
     }
 
-    function previewImage(input) {
-        const preview = document.getElementById('photoPreview');
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; }
-            reader.readAsDataURL(input.files[0]);
-        }
+    function editEntry(idx) {
+        const s = swims[idx];
+        document.getElementById('editIndex').value = idx;
+        document.getElementById('inDate').value = s.date;
+        document.getElementById('inLocation').value = s.location || 'Watersedge';
+        document.getElementById('inTemp').value = s.temp;
+        document.getElementById('inTime').value = s.time;
+        document.getElementById('inDist').value = s.dist;
+        document.getElementById('inNotes').value = s.notes || '';
+        document.getElementById('formTitle').innerText = "✏️ Editing Record...";
+        document.getElementById('submitBtn').innerText = "Update Record";
+        document.getElementById('submitBtn').classList.add('btn-update');
+        document.getElementById('cancelBtn').style.display = "block";
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function cancelEdit() {
+        document.getElementById('editIndex').value = "-1";
+        document.getElementById('formTitle').innerText = "Log New Swim";
+        document.getElementById('submitBtn').innerText = "✅ Save Swim";
+        document.getElementById('submitBtn').classList.remove('btn-update');
+        document.getElementById('cancelBtn').style.display = "none";
+        document.querySelectorAll('input, select, textarea').forEach(i => i.value = '');
     }
 
     function deleteEntry(i) { if(confirm("Delete this?")) { swims.splice(i,1); localStorage.setItem('mySwims', JSON.stringify(swims)); renderTable(); } }
-    function hardReset() { if(confirm("This will reload all 116 notebook swims. Proceed?")) { localStorage.setItem('mySwims', JSON.stringify(fullMasterHistory)); swims = [...fullMasterHistory]; renderTable(); } }
+    function hardReset() { if(confirm("Restore all master records?")) { localStorage.setItem('mySwims', JSON.stringify(fullMasterHistory)); swims = [...fullMasterHistory]; renderTable(); } }
     
     document.getElementById('inDate').value = new Date().toISOString().split('T')[0];
     renderTable();

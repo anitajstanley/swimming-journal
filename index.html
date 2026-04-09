@@ -312,7 +312,7 @@
             const mapUrl = mapLinks[s.location] || `https://www.google.com/maps/search/${encodeURIComponent(s.location)}`;
             body.innerHTML += `<tr>
                 <td>${photoHtml}</td>
-                <td><b>${ukDate}</b><span class="loc-tag">${s.location || '-'} <a href="${mapUrl}" target="_blank" class="map-link">📍</a></span></td>
+                <td><div style="margin-bottom:4px;"><b>${ukDate}</b></div><span class="loc-tag">${s.location || '-'} <a href="${mapUrl}" target="_blank" class="map-link">📍</a></span></td>
                 <td><span class="temp-pill">${s.temp.toFixed(1)}°C</span></td>
                 <td>${s.time}m / ${s.dist}m</td>
                 <td><small>${s.notes || '-'}</small></td>
